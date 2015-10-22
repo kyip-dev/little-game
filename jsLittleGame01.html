@@ -1,0 +1,121 @@
+<!doctype html>
+<title>Test Test</title>
+<style>
+#stage {
+	position: relative;
+}
+
+.cell {
+	position: absolute;
+	width: 80px;
+	height: 80px;
+	border: 1px solid grey;
+	background-color: white;
+}
+</style>
+<div id="header">
+Make all panel to the same Color.<br/>
+Steps used: <span id="step">0</span>
+</div>
+<div id="stage"></div>
+<script>
+	//Get a reference to the stage
+	var stage = document.querySelector("#stage");
+	var stepOutput = document.querySelector("#step");
+	//The 2D array that defines the pattern
+	var pattern = [ 
+		[ 1, 0, 1 ], 
+		[ 0, 1, 0 ], 
+		[ 1, 0, 1 ] 
+	];
+	//The size of each cell
+	var SIZE = 80;
+	//The space between each cell
+	var SPACE = 0;
+	//Display the array
+	var ROWS = pattern.length;
+	var COLUMNS = pattern[0].length;
+	
+	// user used steps
+	var steps = 0;
+	render();
+	
+	function render() {
+		for ( var row = 0; row < ROWS; row++) {
+			for ( var column = 0; column < COLUMNS; column++) {
+				//Create a div HTML element called cell
+				var cell = document.createElement("div");
+				var eid = row +"|"+ column;
+				
+				//Set its CSS class to "cell"
+				cell.setAttribute("class", "cell");
+				cell.setAttribute("id", eid);
+				cell.setAttribute("onclick", "reviseColor(this.id)");
+				
+				//Add the div HTML element to the stage
+				stage.appendChild(cell);
+				
+				//Make it black if it's a "1"
+				if (pattern[row][column] === 1) {
+					cell.style.backgroundColor = "black";
+				}
+				if (pattern[row][column] === 2) {
+					cell.style.backgroundColor = "blue";
+				}
+				//Position the cell in the correct place
+				//with 10 pixels of space around it
+				cell.style.top = row * (SIZE + SPACE) + "px";
+				cell.style.left = column * (SIZE + SPACE) + "px";
+			}
+		}
+	}
+	
+	function reviseColor(objId) {
+	steps = steps+1;
+	stepOutput.innerHTML = steps;
+		var obj = objId.split("|");
+		var row = parseInt(obj[0]);
+		var col = parseInt(obj[1]);
+		
+		// col +1 
+		if (col >= 0 && col < COLUMNS-1) {
+			pattern[row][col+1] = nextValue(pattern[row][col+1]);
+		}
+		// col -1
+		if (col > 0 && col <= COLUMNS-1) {
+			pattern[row][col-1] = nextValue(pattern[row][col-1]);
+		}
+		
+		// row + 1
+		if (row >= 0 && row < ROWS-1) {
+			pattern[row+1][col] = nextValue(pattern[row+1][col]);
+		}
+		// row -1
+		if (row > 0 && row <= ROWS-1) {
+			pattern[row-1][col] = nextValue(pattern[row-1][col]);
+		}
+		
+		// ifself
+		pattern[row][col] = nextValue(pattern[row][col]);
+		render();
+		checkSameColor();
+	}
+	
+	function nextValue(currentValue) {
+		return (currentValue + 1)%2;
+	}
+	
+	function checkSameColor() {
+		var success = true;
+		var colorValueToCheck = pattern[0][0];
+		for ( var row = 0; row < ROWS; row++) {
+			for ( var column = 0; column < COLUMNS; column++) {
+				if (pattern[row][column] != colorValueToCheck) {
+					success = false;
+					return;
+				}
+			}
+		}
+		alert(success);
+	}
+</script>
